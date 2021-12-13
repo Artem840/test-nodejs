@@ -1,27 +1,22 @@
-const db = require('../db')
+const { where } = require('sequelize/dist')
+const User = require('../models/user.model')
 
 class UserController {
     async createUser(req, res) {
         const { id, shared, email } = req.body
-        const newPerson = await db.query(`INSERT INTO person (id, shared, email) values ($1, $2, $3) RETURNING *`, [id, shared, email])
-
-        res.json(newPerson.rows[0])
-    }
-
-    async getUsers(req, res) {
-        const users = 
-    }
-    
-    async getOneUser(req, res) {
-
-    }
-    
-    async updateUser(req, res) {
-
-    }
-    
-    async deleteUser(req, res) {
-
+        let user = await User.findOne({where: id})
+        if (user !== null) {
+            if (email !== null) {
+                user = await user.update({email}, {where: {id}, returning: true})
+            }
+            if (shared) {
+                user = await user.update({shared}, {where: {id}, returning: true})
+            }
+            res.json(user)
+        } else {
+            user = await User.create()
+            res.json(user)
+        }
     }
 }
 
